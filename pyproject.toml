@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "get-specific-text-on-email1-0"
+version = "0.1.0"
+description = ""
+authors = ["NatanelAmlinsky <natanel.amlinsky@gmail.com>"]
+readme = "README.md"
+packages = [{include = "get_specific_text_on_email1"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+openpyxl = "^3.1.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
