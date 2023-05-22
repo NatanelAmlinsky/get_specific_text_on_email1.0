@@ -6,7 +6,9 @@ import json
 class OrderBooksForm:
     json_file = open('configuration.json', 'r', encoding='utf-8')  # open the JSON file
     data = json.load(json_file)  # loading the JSON content to the variable "data"
-
+    account_name = ""
+    senders_email = ""
+    count = 0
     for account_name_txt in data["account name"]:
         if account_name_txt in data["account name"]:
             account_name = account_name_txt
@@ -40,9 +42,4 @@ class OrderBooksForm:
                                             count += 1
                                             break  # exit the inner loop
 
-                print("Found {} emails from '{}'".format(count, senders_email ), account_name)
-
-
-
-
-
+    print("Found {} emails from '{}'".format(count, senders_email), account_name)
