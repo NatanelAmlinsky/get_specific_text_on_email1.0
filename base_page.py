@@ -43,8 +43,8 @@ class OutlookAccount:
         order_number_txt = "מס' הזמנה:"
         kod_number_txt = "קוד הזמנה:"
         mispar_bakasha = "מס' בקשה: "
-        for element in parts:
 
+        for element in parts:
             if kod_number_txt in element:
                 order_info["Order Number"] = element.split(": ")[1]
             elif order_number_txt in element:
@@ -69,7 +69,6 @@ class OutlookAccount:
             elif "מס' טלפון:" in element:
                 order_info["Phone Number"] = element.split(": ")[1]
                 phone_number = order_info["Phone Number"]
-
             elif "סימן ליצור קשר טלפוני:" in element:
                 order_info["Contact Me"] = element.split(": ")[1]
             elif "הספרים שנבחרו:" in element:
