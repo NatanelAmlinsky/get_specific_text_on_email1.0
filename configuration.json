@@ -1,0 +1,14 @@
+{"account name": ["netanel.amlinsky@jewsforjesus.org", "info@yeshua4u.co.il","yeshuanekuda@jewsforjesus.org"],
+  "sender name": "Netanel Amlinsky",
+  "senders email": ["wordpress@yeshuanekuda.co.il"],
+  "Order Number": ["מס' הזמנה:","קוד הזמנה:","מס' בקשה:"],
+  "forms txt subject": ["התקבלה בקשה להזמנת", "ביצע הזמנת ספרים", "התקבלה בקשה ליצירת קשר", "התקבלה בקשה לביקור"],
+  "Full Name": ["שם מלא:"],
+  "Address": ["כתובת:"],
+  "Email": ["אימייל:"],
+  "Phone Number": ["מס' ליצירת קשר:","מס' טלפון:"],
+  "Chosen Books": ["הספרים שנבחרו:"],
+  "Contact Me": ["סימן ליצור קשר טלפוני:"],
+  "Message": ["תוכן ההודעה:"],
+  "IP Address": ["IP:"]
+}
