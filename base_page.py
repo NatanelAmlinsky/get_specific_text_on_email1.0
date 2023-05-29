@@ -7,7 +7,7 @@ import datetime
 
 class OutlookAccount:
     def __init__(self, account_name):
-        self.message = None
+
         self.outlook = win32com.client.Dispatch("Outlook.Application")
         self.namespace = self.outlook.GetNamespace("MAPI")
         self.account_name = account_name
@@ -27,6 +27,7 @@ class OutlookAccount:
 
     def get_table_content(self, email_body):
         # Split the email body into lines
+        self.email_body = email_body
         lines = email_body.split("\n")
 
         # Identify the table rows based on patterns or characteristics
@@ -36,7 +37,6 @@ class OutlookAccount:
 
         # Combine the table rows into a single string
         table_content = "\n".join(table_rows)
-
         return table_content
 
     def get_email_content(self, message):
@@ -45,10 +45,18 @@ class OutlookAccount:
         self.message = message
         email_body = self.message.body
 
+        # Search for the table pattern in the email body
+        table_pattern = r'\w+:\s*\w+'  # Modify the pattern as per your table format
+        table_match = re.search(table_pattern, email_body)
+
+        if table_match:
+            # If table pattern is found, extract the table content
+            table_content = self.get_table_content(email_body)
+            email_body = table_content
+            # Process the table content as desired
 
         # Get the timestamp of the message
         timestamp_str = self.message.CreationTime.strftime('%d/%m/%Y %I:%M %p')
-
         # Parse the timestamp string into a Python datetime object
         timestamp = datetime.datetime.strptime(timestamp_str, '%d/%m/%Y %I:%M %p')
 
@@ -57,7 +65,8 @@ class OutlookAccount:
         time_str = timestamp.strftime('%H:%M')
         parts = []
 
-        order_info = {"Address": "", "Contact Me": "", "Books": "", "Message": "", "IP Address": "", "First Name": "",
+        order_info = {"Order Number": "", "Address": "", "Contact Me": "", "Books": "", "Message": "", "IP Address": "",
+                      "First Name": "",
                       "Last Name": ""}
 
         for line in email_body.splitlines():
@@ -67,33 +76,32 @@ class OutlookAccount:
             for order_number_txt in data["Order Number"]:
                 if order_number_txt in data["Order Number"]:
                     if order_number_txt in element:
-                        order_info["Order Number"] = element.split(": ")[1]
+                        order_info["Order Number"] = element.split(":")[1]
 
             for full_name_txt in data["Full Name"]:
                 if full_name_txt in data["Full Name"]:
                     if full_name_txt in element:
-                        order_info["Full Name"] = element.split(": ")[1]
-                        full_name = order_info["Full Name"]
+                        order_info["Full Name"] = element.split(":")[1]
+
             for first_name in data["First Name"]:
                 if first_name in data["First Name"]:
                     if first_name in element:
-                        order_info["First Name"] = element.split(": ")[1]
+                        order_info["First Name"] = element.split(":")[1]
 
             for last_name in data["Last Name"]:
                 if last_name in data["Last Name"]:
                     if last_name in element:
-                        order_info["Last Name"] = element.split(": ")[1]
-
+                        order_info["Last Name"] = element.split(":")[1]
 
             for address_txt in data["Address"]:
                 if address_txt in data["Address"]:
                     if address_txt in element:
-                        order_info["Address"] = element.split(": ")[1]
+                        order_info["Address"] = element.split(":")[1]
 
             for email_txt in data["Email"]:
                 if email_txt in data["Email"]:
                     if email_txt in element:
-                        order_info["Email"] = element.split(": ")[1]
+                        order_info["Email"] = element.split(":")[1]
                         email = order_info["Email"]
                         fixed_email = email.split("<")[0]
                         order_info["Email"] = fixed_email
@@ -101,24 +109,24 @@ class OutlookAccount:
             for phone_number_txt in data["Phone Number"]:
                 if phone_number_txt in data["Phone Number"]:
                     if phone_number_txt in element:
-                        order_info["Phone Number"] = element.split(": ")[1]
+                        order_info["Phone Number"] = element.split(":")[1]
                         phone_number = order_info["Phone Number"]
 
             for contact_me_txt in data["Contact Me"]:
                 if contact_me_txt in data["Contact Me"]:
                     if contact_me_txt in element:
-                        order_info["Contact Me"] = element.split(": ")[1]
+                        order_info["Contact Me"] = element.split(":")[1]
 
             for chosen_books_txt in data["Chosen Books"]:
                 if chosen_books_txt in data["Chosen Books"]:
                     if chosen_books_txt in element:
-                        order_info["Books"] = element.split(": ")[1]
+                        order_info["Books"] = element.split(":")[1]
                         books = order_info["Books"]
 
             for ip_address_txt in data["IP Address"]:
                 if ip_address_txt in data["IP Address"]:
                     if ip_address_txt in element:
-                        order_info["IP Address"] = element.split(": ")[1]
+                        order_info["IP Address"] = element.split(":")[1]
                         ip_address = order_info["IP Address"]
 
             for message_txt in data["Message"]:
@@ -137,7 +145,8 @@ class OutlookAccount:
                         order_info["Message"] = message_content
 
         # Create a new workbook and select the active worksheet
-        order_info["Full Name"] = order_info["First Name"] + order_info["Last Name"]
+        full_name = order_info["First Name"] + " " + order_info["Last Name"]
+        order_info["Full Name"] = full_name
         wb = openpyxl.load_workbook("C:\\Users\\natan\\Desktop\\EmailAutomation\\shipping_info.xlsx")
         ws = wb.active
 
