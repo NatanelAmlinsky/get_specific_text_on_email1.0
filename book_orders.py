@@ -15,7 +15,6 @@ class OrderBooksForm:
             outlook_account = OutlookAccount(account_name)
             if outlook_account.login():
                 # set up the sender name and email to filter by
-                senders_name = data["sender name"]
                 senders_email = data["senders email"]
                 count = 0
                 forms_txt_subject = data["forms txt subject"]
