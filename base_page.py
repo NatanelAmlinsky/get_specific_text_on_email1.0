@@ -1,5 +1,5 @@
 import json
-
+import re
 import openpyxl
 import win32com.client
 import datetime
@@ -7,6 +7,7 @@ import datetime
 
 class OutlookAccount:
     def __init__(self, account_name):
+        self.message = None
         self.outlook = win32com.client.Dispatch("Outlook.Application")
         self.namespace = self.outlook.GetNamespace("MAPI")
         self.account_name = account_name
@@ -24,14 +25,29 @@ class OutlookAccount:
         self.inbox_folder = self.account.DeliveryStore.GetDefaultFolder(6)
         return True
 
-    def get_email_content(message):
+    def get_table_content(self, email_body):
+        # Split the email body into lines
+        lines = email_body.split("\n")
+
+        # Identify the table rows based on patterns or characteristics
+        table_rows = []
+        for line in lines:
+            table_rows.append(line.strip())
+
+        # Combine the table rows into a single string
+        table_content = "\n".join(table_rows)
+
+        return table_content
+
+    def get_email_content(self, message):
         json_file = open('configuration.json', 'r', encoding='utf-8')  # open the JSON file
         data = json.load(json_file)  # loading the JSON content to the variable "data"
+        self.message = message
+        email_body = self.message.body
 
-        email_body = message.body
 
         # Get the timestamp of the message
-        timestamp_str = message.CreationTime.strftime('%d/%m/%Y %I:%M %p')
+        timestamp_str = self.message.CreationTime.strftime('%d/%m/%Y %I:%M %p')
 
         # Parse the timestamp string into a Python datetime object
         timestamp = datetime.datetime.strptime(timestamp_str, '%d/%m/%Y %I:%M %p')
@@ -41,10 +57,11 @@ class OutlookAccount:
         time_str = timestamp.strftime('%H:%M')
         parts = []
 
+        order_info = {"Address": "", "Contact Me": "", "Books": "", "Message": "", "IP Address": "", "First Name": "",
+                      "Last Name": ""}
+
         for line in email_body.splitlines():
             parts.extend(line.split("\n"))
-
-        order_info = {"Address": "", "Contact Me": "", "Books": "", "Message": "", "IP Address": ""}
 
         for element in parts:
             for order_number_txt in data["Order Number"]:
@@ -57,6 +74,16 @@ class OutlookAccount:
                     if full_name_txt in element:
                         order_info["Full Name"] = element.split(": ")[1]
                         full_name = order_info["Full Name"]
+            for first_name in data["First Name"]:
+                if first_name in data["First Name"]:
+                    if first_name in element:
+                        order_info["First Name"] = element.split(": ")[1]
+
+            for last_name in data["Last Name"]:
+                if last_name in data["Last Name"]:
+                    if last_name in element:
+                        order_info["Last Name"] = element.split(": ")[1]
+
 
             for address_txt in data["Address"]:
                 if address_txt in data["Address"]:
@@ -110,6 +137,7 @@ class OutlookAccount:
                         order_info["Message"] = message_content
 
         # Create a new workbook and select the active worksheet
+        order_info["Full Name"] = order_info["First Name"] + order_info["Last Name"]
         wb = openpyxl.load_workbook("C:\\Users\\natan\\Desktop\\EmailAutomation\\shipping_info.xlsx")
         ws = wb.active
 

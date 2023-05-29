@@ -29,7 +29,7 @@ class OrderBooksForm:
                                     for subject in forms_txt_subject:
                                         if subject in message.Subject.lower():
                                             # get the email content
-                                            parts = base_page.OutlookAccount.get_email_content(message)
+                                            parts = outlook_account.get_email_content(message)
                                             count += 1
                                             break  # exit the inner loop
                         else:
@@ -38,7 +38,7 @@ class OrderBooksForm:
                                     for subject in forms_txt_subject:
                                         if subject in message.Subject.lower():
                                             # get the email content
-                                            parts = base_page.OutlookAccount.get_email_content(message)
+                                            parts = outlook_account.get_email_content(message)
                                             count += 1
                                             break  # exit the inner loop
 
