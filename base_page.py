@@ -68,7 +68,7 @@ class OutlookAccount:
         order_info = {"Organization Name": "", "Order Number": "", "First Name": "",
                       "Last Name": "", "Full Name": "", "City": "", "Address": "", "Email": "", "Phone Number": "",
                       "Books": "", "Book Language": "", "Contact Me": "", "Up 18": "", "Message": "",
-                      "IP Address": ""}
+                      "IP Address": "", "Birthday Year": "", "Background": ""}
 
         for line in email_body.splitlines():
             parts.extend(line.split("\n"))
@@ -89,6 +89,8 @@ class OutlookAccount:
                 if full_name_txt in data["Full Name"]:
                     if full_name_txt in element:
                         order_info["Full Name"] = element.split(":")[1]
+                        order_info["First Name"] = "-"
+                        order_info["Last Name"] = "-"
 
             for first_name in data["First Name"]:
                 if first_name in data["First Name"]:
@@ -99,6 +101,7 @@ class OutlookAccount:
                 if last_name in data["Last Name"]:
                     if last_name in element:
                         order_info["Last Name"] = element.split(":")[1]
+                        order_info["Full Name"] = order_info["First Name"] + " " + order_info["Last Name"]
 
             for address_txt in data["Address"]:
                 if address_txt in data["Address"]:
@@ -145,6 +148,20 @@ class OutlookAccount:
                     if ip_address_txt in element:
                         order_info["IP Address"] = element.split(":")[1]
                         ip_address = order_info["IP Address"]
+            for book_language_txt in data["Book Language"]:
+                if book_language_txt in data["Book Language"]:
+                    if book_language_txt in element:
+                        order_info["Book Language"] = element.split(":")[1]
+
+            for background_txt in data["Background"]:
+                if background_txt in data["Background"]:
+                    if background_txt in element:
+                        order_info["Background"] = element.split(":")[1]
+
+            for birthday_year_txt in data["Birthday Year"]:
+                if birthday_year_txt in data["Birthday Year"]:
+                    if birthday_year_txt in element:
+                        order_info["Birthday Year"] = element.split(":")[1]
 
             for message_txt in data["Message"]:
                 if message_txt in data["Message"]:
@@ -165,7 +182,7 @@ class OutlookAccount:
                             order_info["Message"] = message_content
 
         # Create a new workbook and select the active worksheet
-        if not order_info["First Name"] == "" and order_info["Last Name"] == "":
+        if order_info["First Name"] == "" or order_info["Last Name"] == "":
             full_name = order_info["First Name"] + " " + order_info["Last Name"]
             order_info["Full Name"] = full_name
 
@@ -175,7 +192,7 @@ class OutlookAccount:
         # Write the headers to the first row of the worksheet if the worksheet is empty
         if not any(ws.iter_rows()):
             headers = ["Organization", "Time", "Date", "Order Number", "Full Name", "Address", "Email", "Phone Number",
-                       "Books", "Contact Me", "Message", "IP Address"]
+                       "Books", "Book Language", "Background","Birthday Year", "Contact Me", "Message", "IP Address"]
             ws.append(headers)
 
         # Find the first empty row
@@ -186,6 +203,7 @@ class OutlookAccount:
         # Write the order info to the empty row
         row = [order_info["Organization Name"],time_str, date_str, order_info["Order Number"], order_info["Full Name"],
                order_info["Address"], order_info["Email"], order_info["Phone Number"], order_info["Books"],
+               order_info["Book Language"], order_info["Background"], order_info["Birthday Year"],
                order_info["Contact Me"], order_info["Message"], order_info["IP Address"]]
         for i, value in enumerate(row):
             ws.cell(row=current_row, column=i + 1, value=value)
