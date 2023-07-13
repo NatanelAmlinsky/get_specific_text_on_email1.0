@@ -44,7 +44,8 @@ class OutlookAccount:
         data = json.load(json_file)  # loading the JSON content to the variable "data"
         self.message = message
         email_body = self.message.body
-
+        subject = self.message.Subject
+        print(subject)
         # Search for the table pattern in the email body
         table_pattern = r'\w+:\s*\w+'  # Modify the pattern as per your table format
         table_match = re.search(table_pattern, email_body)
@@ -66,9 +67,11 @@ class OutlookAccount:
         parts = []
 
         order_info = {"Organization Name": "", "Order Number": "", "First Name": "",
-                      "Last Name": "", "Full Name": "", "City": "", "Address": "", "Email": "", "Phone Number": "",
-                      "Books": "", "Book Language": "", "Contact Me": "", "Up 18": "", "Message": "",
-                      "IP Address": "", "Birthday Year": "", "Background": ""}
+                      "Last Name": "", "Full Name": "", "City": "", "Country": "",
+                      "Land": "", "Address": "", "Email": "",
+                      "Phone Number": "", "Books": "", "Book Language": "", "Contact Me": "",
+                      "Up 18": "", "Message": "",  "IP Address": "", "Birthday Year": "",
+                      "Background": "", "Zip Code": ""}
 
         for line in email_body.splitlines():
             parts.extend(line.split("\n"))
@@ -77,7 +80,7 @@ class OutlookAccount:
         for index, sender_email in enumerate(data["senders email"]):
             if message.SenderEmailAddress == sender_email:
                 order_info["Organization Name"] = data["Organization Name"][index]
-
+        count = 0
         for element in parts:
 
             for order_number_txt in data["Order Number"]:
@@ -112,6 +115,15 @@ class OutlookAccount:
                 if city_txt in data["City"]:
                     if city_txt in element:
                         order_info["City"] = element.split(":")[1]
+            for country_txt in data["Country"]:
+                if country_txt in data["Country"]:
+                    if country_txt in element:
+                        order_info["Country"] = element.split(":")[1]
+
+            for land_txt in data["Land"]:
+                if land_txt in data["Land"]:
+                    if land_txt in element:
+                        order_info["Land"] = element.split(":")[1]
 
             for up_18_txt in data["Up 18"]:
                 if up_18_txt in data["Up 18"]:
@@ -141,7 +153,17 @@ class OutlookAccount:
                 if chosen_books_txt in data["Chosen Books"]:
                     if chosen_books_txt in element:
                         order_info["Books"] = element.split(":")[1]
-                        books = order_info["Books"]
+
+            # If statement for unusual body text for unusual emails
+            if order_info["Organization Name"] == "JewishTestimonies":
+                for chosen_books_txt2 in data["Unusual Chosen Books"]:
+                    if chosen_books_txt2 in data["Unusual Chosen Books"]:
+                        if chosen_books_txt2 in element:
+                            order_info["Books"] = order_info["Books"] + ", " + element
+
+            if order_info["Organization Name"] == "Yeshua4U":
+                if "Yeshua PDF" in subject:
+                    order_info["Books"] = "Yeshua PDF"
 
             for ip_address_txt in data["IP Address"]:
                 if ip_address_txt in data["IP Address"]:
@@ -167,7 +189,18 @@ class OutlookAccount:
                 if message_txt in data["Message"]:
                     if message_txt in element:
                         try:
-                            order_info["Message"] = element.split(":")[1]
+                            # Remove non-ASCII characters from the string
+                            cleaned_message = re.sub(r'[^\w\s]', '', element.split(":")[1])
+                            order_info["Message"] = cleaned_message
+                            if order_info["Message"] == "":
+                                index = parts.index(element)
+                                if index < len(parts) - 1:
+                                    # Get the next line and remove leading/trailing whitespace
+                                    message_content = parts[index + 1].strip()
+                                else:
+                                    message_content = ""
+                                order_info["Message"] = message_content
+
                         # In this if statement I discovered that to grab the message content
                         # I had to understand that I am dealing with 2 lines.
                         # Every element focusing in one specific line.
@@ -181,6 +214,11 @@ class OutlookAccount:
                                 message_content = ""
                             order_info["Message"] = message_content
 
+            for zip_code_txt in data["Zip Code"]:
+                if zip_code_txt in data["Zip Code"]:
+                    if zip_code_txt in element:
+                        order_info["Zip Code"] = element.split(":")[1]
+
         # Create a new workbook and select the active worksheet
         if order_info["First Name"] == "" or order_info["Last Name"] == "":
             full_name = order_info["First Name"] + " " + order_info["Last Name"]
@@ -191,8 +229,9 @@ class OutlookAccount:
 
         # Write the headers to the first row of the worksheet if the worksheet is empty
         if not any(ws.iter_rows()):
-            headers = ["Organization", "Time", "Date", "Order Number", "Full Name", "Address", "Email", "Phone Number",
-                       "Books", "Book Language", "Background","Birthday Year", "Contact Me", "Message", "IP Address"]
+            headers = ["Organization", "Time", "Date", "Order Number", "Full Name", "Address", "Land",
+                       "Country", "City", "Zip Code", "Email", "Phone Number", "Books", "Book Language",
+                       "Background", "Birthday Year", "Contact Me", "Message", "IP Address"]
             ws.append(headers)
 
         # Find the first empty row
@@ -201,10 +240,26 @@ class OutlookAccount:
             current_row += 1
 
         # Write the order info to the empty row
-        row = [order_info["Organization Name"],time_str, date_str, order_info["Order Number"], order_info["Full Name"],
-               order_info["Address"], order_info["Email"], order_info["Phone Number"], order_info["Books"],
-               order_info["Book Language"], order_info["Background"], order_info["Birthday Year"],
-               order_info["Contact Me"], order_info["Message"], order_info["IP Address"]]
+        row = [order_info["Organization Name"],
+               time_str,
+               date_str,
+               order_info["Order Number"],
+               order_info["Full Name"],
+               order_info["Address"],
+               order_info["Land"],
+               order_info["Country"],
+               order_info["City"],
+               order_info["Zip Code"],
+               order_info["Email"],
+               order_info["Phone Number"],
+               order_info["Books"],
+               order_info["Book Language"],
+               order_info["Background"],
+               order_info["Birthday Year"],
+               order_info["Contact Me"],
+               order_info["Message"],
+               order_info["IP Address"]]
+
         for i, value in enumerate(row):
             ws.cell(row=current_row, column=i + 1, value=value)
 

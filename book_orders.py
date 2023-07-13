@@ -25,10 +25,11 @@ class OrderBooksForm:
                         if message.SenderEmailType == "EX":
                             for email in senders_email:
                                 if email in message.SenderEmailAddress:
-                                    if email == "form-submission@squarespace.info":
-                                        parts = outlook_account.get_email_content(message)
-                                        count += 1
-                                        break
+                                    for unusual_email in data["Unusual emails"]:
+                                        if email in unusual_email:
+                                            parts = outlook_account.get_email_content(message)
+                                            count += 1
+                                            break
                                     for subject in forms_txt_subject:
                                         if subject in message.Subject.lower():
                                             parts = outlook_account.get_email_content(message)
@@ -37,10 +38,11 @@ class OrderBooksForm:
                         else:
                             for email in senders_email:
                                 if email in message.SenderEmailAddress:
-                                    if email == "form-submission@squarespace.info":
-                                        parts = outlook_account.get_email_content(message)
-                                        count += 1
-                                        break
+                                    for unusual_email in data["Unusual emails"]:
+                                        if email in unusual_email:
+                                            parts = outlook_account.get_email_content(message)
+                                            count += 1
+                                            break
                                     for subject in forms_txt_subject:
                                         if subject in message.Subject.lower():
                                             parts = outlook_account.get_email_content(message)
