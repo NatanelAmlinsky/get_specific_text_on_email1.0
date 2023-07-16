@@ -68,7 +68,7 @@ class OutlookAccount:
 
         order_info = {"Organization Name": "", "Order Number": "", "First Name": "",
                       "Last Name": "", "Full Name": "", "City": "", "Country": "",
-                      "Land": "", "Address": "", "Email": "",
+                      "Land": "","House Number": "","Apartment Number": "", "Address": "", "Email": "",
                       "Phone Number": "", "Books": "", "Book Language": "", "Contact Me": "",
                       "Up 18": "", "Message": "",  "IP Address": "", "Birthday Year": "",
                       "Background": "", "Zip Code": ""}
@@ -142,7 +142,7 @@ class OutlookAccount:
                 if phone_number_txt in data["Phone Number"]:
                     if phone_number_txt in element:
                         order_info["Phone Number"] = element.split(":")[1]
-                        phone_number = order_info["Phone Number"]
+
 
             for contact_me_txt in data["Contact Me"]:
                 if contact_me_txt in data["Contact Me"]:
@@ -165,6 +165,24 @@ class OutlookAccount:
                 if "Yeshua PDF" in subject:
                     order_info["Books"] = "Yeshua PDF"
 
+            if order_info["Organization Name"] == "Medabrim":
+                for chosen_books_txt3 in data["Unusual Chosen Books"]:
+                    if chosen_books_txt3 in data["Unusual Chosen Books"]:
+                        if chosen_books_txt3 in element:
+                            if "Age Confirmation" not in element:
+                                medabrim_book = element.split(":")[0]
+                                order_info["Books"] = order_info["Books"] + ", " + medabrim_book
+
+            for apartment_number_txt in data["Apartment Number"]:
+                if apartment_number_txt in data["Apartment Number"]:
+                    if apartment_number_txt in element:
+                        order_info["Apartment Number"] = element.split(":")[1]
+
+            for house_number_txt in data["House Number"]:
+                if house_number_txt in data["House Number"]:
+                    if house_number_txt in element:
+                        order_info["House Number"] = element.split(":")[1]
+
             for ip_address_txt in data["IP Address"]:
                 if ip_address_txt in data["IP Address"]:
                     if ip_address_txt in element:
@@ -174,6 +192,8 @@ class OutlookAccount:
                 if book_language_txt in data["Book Language"]:
                     if book_language_txt in element:
                         order_info["Book Language"] = element.split(":")[1]
+                        if order_info["Organization Name"] == "OneForIsrael":
+                            order_info["Books"] = "ברית חדשה"
 
             for background_txt in data["Background"]:
                 if background_txt in data["Background"]:
@@ -224,15 +244,19 @@ class OutlookAccount:
             full_name = order_info["First Name"] + " " + order_info["Last Name"]
             order_info["Full Name"] = full_name
 
-        wb = openpyxl.load_workbook("C:\\Users\\natan\\Desktop\\EmailAutomation\\shipping_info.xlsx")
+        wb = openpyxl.load_workbook("C:\\Users\\natan\\Desktop\\EmailAutomation\\orders_info.xlsx")
         ws = wb.active
 
         # Write the headers to the first row of the worksheet if the worksheet is empty
         if not any(ws.iter_rows()):
-            headers = ["Organization", "Time", "Date", "Order Number", "Full Name", "Address", "Land",
-                       "Country", "City", "Zip Code", "Email", "Phone Number", "Books", "Book Language",
-                       "Background", "Birthday Year", "Contact Me", "Message", "IP Address"]
+            headers = ["Organization", "Time", "Date", "Order Number", "Full Name","House Number", "Apartment Number",
+                       "Address", "Land", "Country", "City", "Zip Code", "Email", "Phone Number", "Books",
+                       "Book Language", "Background", "Birthday Year", "Contact Me", "Message", "IP Address",
+                       "Email Link"]
             ws.append(headers)
+            # Get the email link
+        entry_id = message.EntryID
+        email_link = f'outlook:{entry_id}'
 
         # Find the first empty row
         current_row = 2
@@ -245,6 +269,8 @@ class OutlookAccount:
                date_str,
                order_info["Order Number"],
                order_info["Full Name"],
+               order_info["House Number"],
+               order_info["Apartment Number"],
                order_info["Address"],
                order_info["Land"],
                order_info["Country"],
@@ -258,13 +284,14 @@ class OutlookAccount:
                order_info["Birthday Year"],
                order_info["Contact Me"],
                order_info["Message"],
-               order_info["IP Address"]]
+               order_info["IP Address"],
+               email_link]
 
         for i, value in enumerate(row):
             ws.cell(row=current_row, column=i + 1, value=value)
 
         # Save the workbook to a file
-        wb.save("C:\\Users\\natan\\Desktop\\EmailAutomation\\shipping_info.xlsx")
+        wb.save("C:\\Users\\natan\\Desktop\\EmailAutomation\\orders_info.xlsx")
         return print(order_info)
 
 
