@@ -190,8 +190,13 @@ class OutlookAccount:
                     if message_txt in element:
                         try:
                             # Remove non-ASCII characters from the string
+                            # In this if statement I discovered that to grab the message content
+                            # I had to understand that I am dealing with 2 lines.
+                            # Every element focusing in one specific line.
+                            # But I fixed it by go to the next line after "תוכן ההודעה:" to extract the content
                             cleaned_message = re.sub(r'[^\w\s]', '', element.split(":")[1])
                             order_info["Message"] = cleaned_message
+
                             if order_info["Message"] == "":
                                 index = parts.index(element)
                                 if index < len(parts) - 1:
@@ -200,11 +205,6 @@ class OutlookAccount:
                                 else:
                                     message_content = ""
                                 order_info["Message"] = message_content
-
-                        # In this if statement I discovered that to grab the message content
-                        # I had to understand that I am dealing with 2 lines.
-                        # Every element focusing in one specific line.
-                        # But I fixed it by go to the next line after "תוכן ההודעה:" to extract the content
                         except:
                             index = parts.index(element)
                             if index < len(parts) - 1:
