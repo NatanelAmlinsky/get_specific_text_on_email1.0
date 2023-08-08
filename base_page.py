@@ -1,9 +1,9 @@
 import json
 import re
 import openpyxl
+import requests
 import win32com.client
 import datetime
-
 
 class OutlookAccount:
     def __init__(self, account_name):
@@ -143,7 +143,6 @@ class OutlookAccount:
                     if phone_number_txt in element:
                         order_info["Phone Number"] = element.split(":")[1]
 
-
             for contact_me_txt in data["Contact Me"]:
                 if contact_me_txt in data["Contact Me"]:
                     if contact_me_txt in element:
@@ -162,8 +161,10 @@ class OutlookAccount:
                             order_info["Books"] = order_info["Books"] + ", " + element
 
             if order_info["Organization Name"] == "Yeshua4U":
-                if "Yeshua PDF" in subject:
-                    order_info["Books"] = "Yeshua PDF"
+                for y4u_books in data["Yeshua4U Unusual Books"]:
+                    if y4u_books in data["Yeshua4U Unusual Books"]:
+                        if y4u_books in subject:
+                            order_info["Books"] = subject.split("- ")[1]
 
             if order_info["Organization Name"] == "Medabrim":
                 for chosen_books_txt3 in data["Unusual Chosen Books"]:
